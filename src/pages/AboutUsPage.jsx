@@ -1,7 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, CheckCircle, Target, Users, Zap, Heart, Globe,
-  Lightbulb, Shield, Rocket, Code2, Star
+  ArrowRight, CheckCircle,
+  Code2,
+  Globe,
+  Heart,
+  Lightbulb,
+  Rocket,
+  Shield,
+  Target, Users, Zap
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { MotionCard } from '../components/ui/Card';
@@ -37,21 +43,13 @@ const timeline = [
   { year: '2019', event: 'Founded', desc: 'Vichakra Technologies was born from a simple belief: businesses deserve technology partners who truly understand their goals.' },
   { year: '2020', event: 'First 10 Clients', desc: 'Delivered 12 production projects, earning 100% client retention for the first two years.' },
   { year: '2022', event: 'AI Division Launched', desc: 'Established a dedicated AI/ML engineering team, serving clients across APAC and Europe.' },
-  { year: '2024', event: '50+ Projects Milestone', desc: 'Crossed the landmark of 50 completed projects with a 4.9/5 client satisfaction score.' },
+  { year: '2024', event: '15+ Projects Milestone', desc: 'Crossed the landmark of 15 completed projects with a 4.9/5 client satisfaction score.' },
   { year: 'Now', event: 'Global Reach', desc: 'Serving clients across 12 countries, with engineering expertise spanning 20+ cutting-edge technologies.' },
 ];
-
-import SEO from '../components/ui/SEO';
 
 export default function AboutUsPage() {
   return (
     <div className="w-full">
-      <SEO 
-        title="About Us | Trusted Tech Consultants" 
-        description="Learn about Vichakra Technologies, a premier technology consultancy. We are a cross-functional team of developers, UI/UX designers, and AI engineers."
-        keywords="about Vichakra Technologies, tech consultants, UI/UX designers, AI engineers, cross-functional tech team, global reach tech agency"
-        url="/about"
-      />
 
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="relative pt-32 pb-24 bg-hero-gradient bg-hero-pattern overflow-hidden">
@@ -142,7 +140,7 @@ export default function AboutUsPage() {
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="glass rounded-2xl p-5">
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      {[{ n: '50+', l: 'Projects' }, { n: '12', l: 'Countries' }, { n: '4.9★', l: 'Rating' }].map(({ n, l }) => (
+                      {[{ n: '15+', l: 'Projects' }, { n: '12', l: 'Countries' }, { n: '4.9★', l: 'Rating' }].map(({ n, l }) => (
                         <div key={l}>
                           <div className="font-extrabold text-xl text-gray-900">{n}</div>
                           <div className="text-xs text-gray-500">{l}</div>

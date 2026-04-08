@@ -114,9 +114,9 @@ const clientAvatars = [
 ];
 
 const stats = [
-  { n: '50+', label: 'Projects Delivered' },
+  { n: '15+', label: 'Projects Delivered' },
   { n: '100%', label: 'Client Satisfaction' },
-  { n: '5+', label: 'Years Experience' },
+  { n: '1+', label: 'Years Experience' },
   { n: '20+', label: 'Technologies' },
   { n: '98.5%', label: 'On-Time Delivery' },
   { n: '60%', label: 'Avg. Ops Cost Reduction' },
@@ -133,8 +133,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col w-full">
-      <SEO 
-        title="Enterprise Technology & Software Development" 
+      <SEO
+        title="Enterprise Technology & Software Development"
         description="Vichakra Technologies builds high-performance web platforms and AI-driven automation systems to propel ambitious businesses. We engineer outcomes and competitive advantage."
         keywords="enterprise technology, scalable software development, custom software, AI automation, high-performance web platforms, tech strategy"
         url="/"
@@ -162,7 +162,7 @@ export default function HomePage() {
               <motion.div custom={0} variants={itemFade}>
                 <span className="section-badge">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-                  Trusted by 50+ Global Businesses
+                  Trusted by 15+ Global Businesses
                 </span>
               </motion.div>
 
@@ -208,7 +208,7 @@ export default function HomePage() {
                     ))}
                     <span className="font-bold text-gray-900 text-sm ml-1.5">4.9 / 5</span>
                   </div>
-                  <p className="text-xs text-gray-500 font-medium">Average rating across 50+ client engagements</p>
+                  <p className="text-xs text-gray-500 font-medium">Average rating across 15+ client engagements</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -312,7 +312,7 @@ export default function HomePage() {
               {/* Stats overlay card */}
               <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl p-5 shadow-[0_8px_32px_-4px_rgba(0,0,0,0.10)] border border-gray-100">
                 <div className="grid grid-cols-2 gap-5 text-center">
-                  {[{ n: '50+', l: 'Projects' }, { n: '5+', l: 'Years' }].map(({ n, l }) => (
+                  {[{ n: '15+', l: 'Projects' }, { n: '5+', l: 'Years' }].map(({ n, l }) => (
                     <div key={l}>
                       <div className="text-2xl font-extrabold gradient-text leading-none">{n}</div>
                       <div className="text-xs text-gray-500 mt-1 font-medium">{l}</div>
@@ -511,7 +511,7 @@ export default function HomePage() {
             </h2>
 
             <p className="text-xl text-white/70 mb-12 leading-relaxed max-w-2xl mx-auto">
-              Join 50+ businesses that chose Vichakra to power their most critical digital infrastructure. Start with a zero-pressure discovery call.
+              Join 15+ businesses that chose Vichakra to power their most critical digital infrastructure. Start with a zero-pressure discovery call.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">

@@ -7,6 +7,12 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
+const WhatsAppIcon = ({ size = 24, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+  </svg>
+);
+
 const services = [
   { value: 'web', label: 'Web Development' },
   { value: 'design', label: 'Website Design' },
@@ -35,10 +41,17 @@ const contactItems = [
   },
   {
     icon: Phone,
-    label: 'Phone',
-    value: '+91 98765 43210',
+    label: 'Call Us',
+    value: '+91 99593 62328',
     sub: 'Mon-Fri, 9am to 6pm IST',
-    href: 'tel:+919876543210',
+    href: 'tel:+919959362328',
+  },
+  {
+    icon: WhatsAppIcon,
+    label: 'WhatsApp',
+    value: '+91 99593 62328',
+    sub: 'Chat with our team instantly',
+    href: 'https://wa.me/919959362328',
   },
   {
     icon: MapPin,
@@ -73,11 +86,31 @@ export default function ContactUsPage() {
   const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data) => {
-    // Simulate API call — replace with Formspree/EmailJS endpoint
-    await new Promise((r) => setTimeout(r, 1800));
-    console.log('Form data:', data);
-    setSuccess(true);
-    reset();
+    try {
+      await fetch('https://formsubmit.co/ajax/vichakratechnologies@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          company: data.company || 'Not Provided',
+          phone: data.phone || 'Not Provided',
+          service: data.service,
+          message: data.message,
+          _subject: `New project inquiry from ${data.name}!`,
+          _cc: 'rohithvitteamraj@gmail.com',
+          _captcha: 'false'
+        })
+      });
+      setSuccess(true);
+      reset();
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('There was an issue sending your message. Please try emailing us directly.');
+    }
   };
 
   return (
@@ -268,7 +301,7 @@ export default function ContactUsPage() {
                           <label className="text-sm font-semibold text-gray-700">Full Name *</label>
                           <input
                             {...register('name', { required: 'Your name is required' })}
-                            placeholder="Sarah Johnson"
+                            placeholder="enter your full name"
                             className={`${fieldBase} ${errors.name ? fieldError : ''}`}
                           />
                           {errors.name && (
@@ -295,7 +328,7 @@ export default function ContactUsPage() {
                               required: 'Email is required',
                               pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email' },
                             })}
-                            placeholder="you@company.com"
+                            placeholder="company@mail.com"
                             className={`${fieldBase} ${errors.email ? fieldError : ''}`}
                           />
                           {errors.email && (
@@ -313,32 +346,21 @@ export default function ContactUsPage() {
                         </div>
                       </div>
 
-                      {/* Service + Budget */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-gray-700">Service Needed *</label>
-                          <select
-                            {...register('service', { required: 'Please select a service' })}
-                            className={`${fieldBase} cursor-pointer ${errors.service ? fieldError : ''}`}
-                          >
-                            <option value="">Select a service...</option>
-                            {services.map((s) => (
-                              <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                          </select>
-                          {errors.service && (
-                            <p className="text-xs text-red-500 mt-1">{errors.service.message}</p>
-                          )}
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-gray-700">Estimated Budget</label>
-                          <select {...register('budget')} className={`${fieldBase} cursor-pointer`}>
-                            <option value="">Budget range...</option>
-                            {budgets.map((b) => (
-                              <option key={b.value} value={b.value}>{b.label}</option>
-                            ))}
-                          </select>
-                        </div>
+                      {/* Service */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">Service Needed *</label>
+                        <select
+                          {...register('service', { required: 'Please select a service' })}
+                          className={`${fieldBase} cursor-pointer ${errors.service ? fieldError : ''}`}
+                        >
+                          <option value="">Select a service...</option>
+                          {services.map((s) => (
+                            <option key={s.value} value={s.value}>{s.label}</option>
+                          ))}
+                        </select>
+                        {errors.service && (
+                          <p className="text-xs text-red-500 mt-1">{errors.service.message}</p>
+                        )}
                       </div>
 
                       {/* Message */}
