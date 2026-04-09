@@ -7,6 +7,7 @@ import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import AboutUsPage from './pages/AboutUsPage';
 import WhyUsPage from './pages/WhyUsPage';
+import OurFlowPage from './pages/OurFlowPage';
 import ContactUsPage from './pages/ContactUsPage';
 
 /* Scroll to top on every route change */
@@ -42,6 +43,7 @@ function AnimatedRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutUsPage />} />
           <Route path="/why-us" element={<WhyUsPage />} />
+          <Route path="/our-flow" element={<OurFlowPage />} />
           <Route path="/contact" element={<ContactUsPage />} />
         </Routes>
       </motion.div>
