@@ -1,6 +1,5 @@
+import { ChevronRight, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, ChevronRight, Heart } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const services = [
   'Web Development',
@@ -133,7 +132,7 @@ export default function Footer() {
             <ul className="space-y-5">
               <li>
                 <a
-                  href="mailto:hello@vichakratech.com"
+                  href="mailto:info@vichakratechnologies.com"
                   className="flex items-start gap-3 text-sm text-gray-400 hover:text-brand transition-colors group"
                 >
                   <span className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors mt-0.5">
@@ -141,7 +140,7 @@ export default function Footer() {
                   </span>
                   <div>
                     <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-0.5">Email</div>
-                    hello@vichakratech.com
+                    info@vichakratechnologies.com
                   </div>
                 </a>
               </li>
@@ -171,7 +170,7 @@ export default function Footer() {
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <p>&copy; {new Date().getFullYear()} Vichakra Technologies. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
-            Built with <Heart size={12} className="text-brand fill-brand" /> for world-class businesses
+
           </p>
           <div className="flex gap-5">
             <a href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</a>

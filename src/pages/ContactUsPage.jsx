@@ -1,10 +1,14 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  CheckCircle2,
+  Clock,
+  Mail,
+  MapPin,
+  Phone,
+  Send
+} from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Mail, Phone, MapPin, CheckCircle2, ArrowRight,
-  Send, Clock, Globe, MessageSquare, Building2
-} from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 const WhatsAppIcon = ({ size = 24, className }) => (
@@ -35,9 +39,9 @@ const contactItems = [
   {
     icon: Mail,
     label: 'Email',
-    value: 'hello@vichakratech.com',
+    value: 'info@vichakratechnologies.com',
     sub: 'We reply within 24 hours',
-    href: 'mailto:hello@vichakratech.com',
+    href: 'mailto:info@vichakratechnologies.com',
   },
   {
     icon: Phone,
@@ -87,7 +91,7 @@ export default function ContactUsPage() {
 
   const onSubmit = async (data) => {
     try {
-      await fetch('https://formsubmit.co/ajax/vichakratechnologies@gmail.com', {
+      await fetch('https://formsubmit.co/ajax/info@vichakratechnologies.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,8 +119,8 @@ export default function ContactUsPage() {
 
   return (
     <div className="w-full">
-      <SEO 
-        title="Contact Us | Start Your Project" 
+      <SEO
+        title="Contact Us | Start Your Project"
         description="Get in touch with Vichakra Technologies. Let's discuss your web, design, or AI project and build something great together. Available globally."
         keywords="contact Vichakra Technologies, hire developers, technology consulting, start tech project, business automation consulting"
         url="/contact"
@@ -336,7 +340,7 @@ export default function ContactUsPage() {
                           )}
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold text-gray-700">Phone (Optional)</label>
+                          <label className="text-sm font-semibold text-gray-700">Phone </label>
                           <input
                             type="tel"
                             {...register('phone')}
