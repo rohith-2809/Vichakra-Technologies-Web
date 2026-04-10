@@ -190,7 +190,8 @@ export default function AboutUsPage() {
             </motion.h2>
           </div>
           <div className="relative max-w-3xl mx-auto">
-            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-brand/0 via-brand/30 to-brand/0" />
+            {/* Connecting dashed line stops exactly at the top and bottom icons */}
+            <div className="absolute left-8 top-8 bottom-8 w-px border-l-2 border-dashed border-brand/20" />
             <div className="space-y-12">
               {timeline.map((item, i) => (
                 <motion.div
@@ -201,8 +202,8 @@ export default function AboutUsPage() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className="relative flex gap-8 pl-20"
                 >
-                  <div className="absolute left-0 w-16 h-16 rounded-2xl bg-brand/10 border border-brand/20 flex flex-col items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-brand">{item.year}</span>
+                  <div className="absolute left-0 w-16 h-16 rounded-2xl bg-white border border-brand/20 flex flex-col items-center justify-center shrink-0 z-10 shadow-[0_4px_20px_-4px_rgba(0,126,121,0.1)]">
+                    <span className="text-xs font-black text-brand">{item.year}</span>
                   </div>
                   <div className="pt-3 pb-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{item.event}</h3>

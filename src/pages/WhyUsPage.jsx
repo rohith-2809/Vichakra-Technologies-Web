@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import {
-  Globe, Code2, Cpu, Smartphone, ArrowRight, CheckCircle,
+  Globe, Code2, Cpu, Smartphone, ArrowRight, CheckCircle, XCircle,
   Zap, Shield, TrendingUp, Users, Award, Star,
   ChevronRight
 } from 'lucide-react';
@@ -252,11 +252,7 @@ export default function WhyUsPage() {
                     <CheckCircle className="w-5 h-5 text-brand" />
                   </div>
                   <div className="py-4 px-6 flex items-center justify-center col-span-1">
-                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 relative">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-3 h-0.5 bg-gray-300 rotate-45 rounded-full" />
-                      </div>
-                    </div>
+                    <XCircle strokeWidth={2.5} className="w-5 h-5 text-gray-300" />
                   </div>
                 </motion.div>
               ))}
