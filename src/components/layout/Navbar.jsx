@@ -47,12 +47,17 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group z-10">
-            <div className="relative w-9 h-9">
-              <div className="absolute inset-0 rounded-xl bg-brand rotate-3 group-hover:rotate-6 transition-transform duration-300" />
-              <div className="relative w-full h-full rounded-xl bg-brand-dark flex items-center justify-center font-extrabold text-white text-lg shadow-brand-sm">
-                V
-              </div>
+          <Link 
+            to="/" 
+            className="flex items-center gap-3 group z-10"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <div className="relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shadow-sm border border-gray-100 bg-white">
+              <img 
+                src="/logo.svg" 
+                alt="Vichakra Logo" 
+                className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300" 
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-lg leading-none tracking-tight text-gray-900 group-hover:text-brand transition-colors duration-300">

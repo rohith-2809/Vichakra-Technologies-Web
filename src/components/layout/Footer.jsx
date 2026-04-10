@@ -62,12 +62,17 @@ export default function Footer() {
 
           {/* Brand Column */}
           <div className="lg:col-span-1 space-y-6">
-            <Link to="/" className="flex items-center gap-3 group w-fit">
-              <div className="relative w-9 h-9">
-                <div className="absolute inset-0 rounded-xl bg-brand rotate-3 group-hover:rotate-6 transition-transform duration-300" />
-                <div className="relative w-full h-full rounded-xl bg-brand-dark flex items-center justify-center font-extrabold text-white text-lg shadow-brand-sm">
-                  V
-                </div>
+            <Link 
+              to="/" 
+              className="flex items-center gap-3 group w-fit"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <div className="relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shadow-sm bg-white border border-white/10">
+                <img 
+                  src="/logo.svg" 
+                  alt="Vichakra Logo" 
+                  className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300" 
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-extrabold text-lg leading-none text-white">Vichakra</span>
@@ -173,8 +178,8 @@ export default function Footer() {
 
           </p>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-300 transition-colors">Terms of Service</a>
+            <Link to="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</Link>
             <a href="#" className="hover:text-gray-300 transition-colors">Cookies</a>
           </div>
         </div>

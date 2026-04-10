@@ -9,6 +9,8 @@ import AboutUsPage from './pages/AboutUsPage';
 import WhyUsPage from './pages/WhyUsPage';
 import OurFlowPage from './pages/OurFlowPage';
 import ContactUsPage from './pages/ContactUsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsConditionsPage from './pages/TermsConditionsPage';
 
 /* Scroll to top on every route change */
 function ScrollToTop() {
@@ -45,6 +47,8 @@ function AnimatedRoutes() {
           <Route path="/why-us" element={<WhyUsPage />} />
           <Route path="/our-flow" element={<OurFlowPage />} />
           <Route path="/contact" element={<ContactUsPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsConditionsPage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
