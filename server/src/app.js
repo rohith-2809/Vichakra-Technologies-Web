@@ -13,7 +13,10 @@ const app  = express();
 const PORT = process.env.PORT || 5000;
 
 // ── Database ────────────────────────────────────────────────────────────────
-connectDB();
+connectDB().then(() => {
+  const autoSeedAdmins = require('./utils/autoSeed');
+  autoSeedAdmins();
+});
 
 // ── Security middleware ─────────────────────────────────────────────────────
 app.use(helmet());
