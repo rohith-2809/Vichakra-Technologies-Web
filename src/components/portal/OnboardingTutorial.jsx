@@ -43,12 +43,15 @@ const STEPS = [
 ];
 
 export default function OnboardingTutorial({ onComplete }) {
-  const { user }        = useAuth();
+  const { user, updateUser } = useAuth();
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
 
   const finish = async () => {
-    try { await api.patch('/portal/onboarding-complete'); } catch { /* fail silently */ }
+    try { 
+      await api.patch('/portal/onboarding-complete'); 
+      updateUser({ isFirstLogin: false });
+    } catch { /* fail silently */ }
     setDone(true);
     setTimeout(onComplete, 400);
   };

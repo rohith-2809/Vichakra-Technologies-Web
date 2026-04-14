@@ -24,6 +24,7 @@ import ProjectDetailPage from './pages/admin/ProjectDetailPage';
 import FilesPage from './pages/admin/FilesPage';
 import StatusUpdatesPage from './pages/admin/StatusUpdatesPage';
 import AdminFeedbackPage from './pages/admin/FeedbackPage';
+import AdminSupportPage from './pages/admin/SupportPage';
 import DocumentsPage from './pages/admin/DocumentsPage';
 
 // Portal
@@ -117,6 +118,7 @@ function App() {
               <Route path="files"            element={<FilesPage />} />
               <Route path="status"           element={<StatusUpdatesPage />} />
               <Route path="feedback"         element={<AdminFeedbackPage />} />
+              <Route path="support"          element={<AdminSupportPage />} />
               <Route path="documents"        element={<DocumentsPage />} />
             </Route>
 

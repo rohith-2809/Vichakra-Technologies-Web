@@ -86,6 +86,18 @@ app.use((err, _req, res, _next) => {
   res.status(status).json({ error: message });
 });
 
+// ── Keep Alive (for Render) ──────────────────────────────────────────────────
+const axios = require('axios');
+setInterval(() => {
+  const url = process.env.NODE_ENV === 'production' 
+    ? process.env.CLIENT_URL.replace('www.', 'api.') // Basic heuristic for API URL
+    : `http://localhost:${PORT}`;
+  
+  axios.get(`${url}/api/health`)
+    .then(() => console.log('Keep-alive ping successful'))
+    .catch((err) => console.error('Keep-alive ping failed:', err.message));
+}, 10 * 60 * 1000); // 10 minutes
+
 // ── Start ──────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

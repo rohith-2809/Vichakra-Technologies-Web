@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Trash2, CheckCircle2, Circle, ExternalLink, X, Save } from 'lucide-react';
 import api from '../../api/axios';
@@ -9,6 +8,7 @@ const STATUSES = ['draft', 'active', 'in-review', 'delivered', 'closed'];
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [project,  setProject]  = useState(null);
   const [reqs,     setReqs]     = useState(null);
   const [tab,      setTab]      = useState('overview');
@@ -38,6 +38,16 @@ export default function ProjectDetailPage() {
   };
 
   const changeStatus = (status) => save({ status });
+
+  const deleteProject = async () => {
+    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+    try {
+      await api.delete(`/admin/projects/${id}`);
+      navigate('/admin/projects');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Delete failed');
+    }
+  };
 
   const toggleMilestone = (idx) => {
     const milestones = project.milestones.map((m, i) =>
@@ -106,6 +116,13 @@ export default function ProjectDetailPage() {
               className="input-field text-sm py-1.5 pr-8 font-medium">
               {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
+            <button 
+              onClick={deleteProject}
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title="Delete Project"
+            >
+              <Trash2 size={18} />
+            </button>
           </div>
         </div>
 

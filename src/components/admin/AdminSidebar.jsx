@@ -26,6 +26,7 @@ const SECTIONS = [
   {
     label: 'Support',
     items: [
+      { to: '/admin/support',  icon: MessageSquare,   label: 'Support Tickets' },
       { to: '/admin/feedback', icon: MessageSquare,   label: 'Feedback' },
     ],
   },
