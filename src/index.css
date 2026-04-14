@@ -183,6 +183,13 @@
   100% { background-position: 0% 50%; }
 }
 
+/* Hide scrollbar but keep scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* Animation classes */
 .animate-float        { animation: float 4s ease-in-out infinite; }
 .animate-float-slow   { animation: float-delayed 6s ease-in-out infinite; }
