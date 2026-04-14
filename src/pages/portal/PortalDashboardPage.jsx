@@ -27,8 +27,9 @@ export default function PortalDashboardPage() {
   useEffect(() => {
     Promise.all([
       api.get('/portal/projects'),
-      api.get('/portal/status-updates'),
       
+      api.get('/portal/status-updates'),
+
 
     ]).then(([proj, upd]) => {
       setProjects(proj.data.projects);

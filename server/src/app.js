@@ -12,6 +12,9 @@ const connectDB  = require('./config/db');
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust Render's load balancer so express-rate-limit reads X-Forwarded-For correctly
+app.set('trust proxy', 1);
+
 // ── Database ────────────────────────────────────────────────────────────────
 connectDB().then(() => {
   const autoSeedAdmins = require('./utils/autoSeed');
@@ -89,14 +92,10 @@ app.use((err, _req, res, _next) => {
   res.status(status).json({ error: message });
 });
 
-// ── Keep Alive (for Render) ──────────────────────────────────────────────────
+// ── Keep Alive (for Render Free Tier) ────────────────────────────────────────
 const axios = require('axios');
 setInterval(() => {
-  const url = process.env.NODE_ENV === 'production' 
-    ? process.env.CLIENT_URL.replace('www.', 'api.') // Basic heuristic for API URL
-    : `http://localhost:${PORT}`;
-  
-  axios.get(`${url}/api/health`)
+  axios.get(`http://localhost:${PORT}/api/health`)
     .then(() => console.log('Keep-alive ping successful'))
     .catch((err) => console.error('Keep-alive ping failed:', err.message));
 }, 10 * 60 * 1000); // 10 minutes
