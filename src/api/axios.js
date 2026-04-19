@@ -65,8 +65,11 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearAccessToken();
-        // Only redirect if we're not already on the login page
-        if (window.location.pathname !== '/login') {
+        // Only redirect to login from protected routes — never from public pages
+        const onProtectedRoute = ['/admin', '/portal'].some((p) =>
+          window.location.pathname.startsWith(p)
+        );
+        if (onProtectedRoute) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
