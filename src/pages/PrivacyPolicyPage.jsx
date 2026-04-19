@@ -87,7 +87,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-gray-600 mb-0">
                 If you have any questions regarding this Privacy Policy, you may contact us using the information below:
               </p>
-              <div className="mt-4 font-semibold text-brand">
+              <div className="mt-4 font-semibold text-brand break-all">
                 info@vichakratechnologies.com
               </div>
             </div>

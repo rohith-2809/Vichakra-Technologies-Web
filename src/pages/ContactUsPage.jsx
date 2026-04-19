@@ -163,7 +163,7 @@ export default function ContactUsPage() {
       {/* ======= CONTACT INFO STRIP ======= */}
       <section className="py-8 bg-brand">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-4">
             {contactItems.map(({ icon: Icon, label, value, sub, href }) => (
               <motion.div
                 key={label}
@@ -178,11 +178,11 @@ export default function ContactUsPage() {
                 <div>
                   <div className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">{label}</div>
                   {href ? (
-                    <a href={href} className="text-sm font-semibold text-white hover:text-white/80 transition-colors leading-tight block">
+                    <a href={href} className="text-sm font-semibold text-white hover:text-white/80 transition-colors leading-tight block break-all">
                       {value}
                     </a>
                   ) : (
-                    <div className="text-sm font-semibold text-white leading-tight">{value}</div>
+                    <div className="text-sm font-semibold text-white leading-tight break-all">{value}</div>
                   )}
                 </div>
               </motion.div>

@@ -145,7 +145,7 @@ export default function Footer() {
                   </span>
                   <div>
                     <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-0.5">Email</div>
-                    info@vichakratechnologies.com
+                    <div className="break-all">info@vichakratechnologies.com</div>
                   </div>
                 </a>
               </li>
