@@ -1,15 +1,17 @@
 const nodemailer = require('nodemailer');
 
-// Setup transporter optimized for GoDaddy/Office365 or Custom Hosts
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtpout.secureserver.net', // GoDaddy standard. Change to 'smtp.office365.com' if using Microsoft 365 GoDaddy
-  port: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : 465,
-  secure: process.env.EMAIL_PORT == 587 ? false : true, // false for 587 (TLS), true for 465 (SSL)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// Build transporter lazily inside the handler so that dotenv has
+// already populated process.env before credentials are read.
+const createMailTransporter = () =>
+  nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtpout.secureserver.net',
+    port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
+    secure: process.env.SMTP_PORT == 587 ? false : true,
+    auth: {
+      user: process.env.EMAIL_MESSAGE,
+      pass: process.env.EMAIL_MESSAGE_PASS,
+    },
+  });
 
 exports.sendDocument = async (req, res) => {
   try {
@@ -26,8 +28,10 @@ exports.sendDocument = async (req, res) => {
 
     const typeStr = type || 'Document';
 
+    const transporter = createMailTransporter();
+
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'billing@vichakratechnologies.com',
+      from: `Vichakra Technologies <${process.env.EMAIL_MESSAGE}>`,
       to: email,
       subject: subject || `Vichakra Technologies - Your ${typeStr}`,
       html: `
@@ -60,6 +64,7 @@ exports.sendDocument = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+    transporter.close();
 
     res.status(200).json({ message: 'Document sent successfully' });
   } catch (error) {

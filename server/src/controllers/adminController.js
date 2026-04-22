@@ -453,7 +453,7 @@ const buildEmailHtml = exports.buildEmailHtml = ({ eyebrow, headline, body, ctaT
     <div style="width:40px;height:2px;background:linear-gradient(90deg,#0f766e,#14b8a6);margin:0 auto 16px"></div>
     <p style="margin:0 0 6px;color:#475569;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">© 2026 Vichakra Technologies. All rights reserved.</p>
     <p style="margin:0 0 4px;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><a href="https://www.vichakratechnologies.com" style="color:#14b8a6;text-decoration:none">www.vichakratechnologies.com</a></p>
-    <p style="margin:0;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><a href="mailto:info@vichakratechnologies.com" style="color:#0f766e;text-decoration:none">info@vichakratechnologies.com</a></p>
+    <p style="margin:0;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><a href="mailto:${process.env.EMAIL_MESSAGE}" style="color:#0f766e;text-decoration:none">${process.env.EMAIL_MESSAGE}</a></p>
   </div>
 </div>`;
 };
