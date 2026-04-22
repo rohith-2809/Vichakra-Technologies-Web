@@ -5,12 +5,20 @@ const FileModel    = require('../models/File');
 const Feedback     = require('../models/Feedback');
 const SupportTicket = require('../models/SupportTicket');
 const User         = require('../models/User');
+const Message      = require('../models/Message');
 
 // ── Projects & status ─────────────────────────────────────────────────────────
 exports.getMyProjects = async (req, res) => {
   const projects = await Project.find({ client: req.user._id })
     .sort({ updatedAt: -1 })
-    .populate('attachments');
+    .populate('attachments')
+    .lean();
+    
+  for (let p of projects) {
+    const reqs = await Requirements.findOne({ project: p._id }).select('status');
+    p.requirementsStatus = reqs ? reqs.status : 'none';
+  }
+
   res.json({ projects });
 };
 
@@ -43,7 +51,7 @@ exports.getRequirements = async (req, res) => {
 };
 
 exports.saveRequirements = async (req, res) => {
-  const { project, vision, targetAudience, goals, designPreferences, features, additionalNotes } = req.body;
+  const { project, projectType, vision, targetAudience, competitors, goals, brandValues, deliverables, designPreferences, features, integrations, additionalNotes } = req.body;
 
   // Security: ensure project belongs to this client
   const proj = await Project.findOne({ _id: project, client: req.user._id });
@@ -57,7 +65,7 @@ exports.saveRequirements = async (req, res) => {
 
   const reqs = await Requirements.findOneAndUpdate(
     { project },
-    { project, client: req.user._id, vision, targetAudience, goals, designPreferences, features, additionalNotes },
+    { project, client: req.user._id, projectType, vision, targetAudience, competitors, goals, brandValues, deliverables, designPreferences, features, integrations, additionalNotes },
     { upsert: true, new: true, runValidators: true }
   );
   res.json({ requirements: reqs });
@@ -110,6 +118,28 @@ exports.uploadRequirementFiles = async (req, res) => {
   reqs.files.push(...savedFiles.map((f) => f._id));
   await reqs.save();
   res.json({ files: savedFiles });
+};
+
+exports.deleteRequirementFile = async (req, res) => {
+  const reqs = await Requirements.findOne({ _id: req.params.id, client: req.user._id });
+  if (!reqs) return res.status(404).json({ error: 'Requirements not found' });
+  if (reqs.status === 'submitted') {
+    return res.status(400).json({ error: 'Requirements already submitted.' });
+  }
+
+  // Remove file reference from reqs
+  reqs.files = reqs.files.filter(fId => fId.toString() !== req.params.fileId);
+  await reqs.save();
+
+  // Find the file model
+  const file = await FileModel.findOne({ _id: req.params.fileId, uploadedBy: req.user._id });
+  if (file) {
+    const fs = require('fs');
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    await FileModel.findByIdAndDelete(req.params.fileId);
+  }
+
+  res.json({ message: 'File removed successfully' });
 };
 
 // ── Files (public files visible to client) ────────────────────────────────────
@@ -165,3 +195,57 @@ exports.createTicket = async (req, res) => {
   });
   res.status(201).json({ ticket });
 };
+
+// ── Messages ──────────────────────────────────────────────────────────────────
+exports.getMessages = async (req, res) => {
+  const { projectId } = req.params;
+
+  // Ensure this project belongs to this client
+  const project = await Project.findOne({ _id: projectId, client: req.user._id });
+  if (!project) return res.status(404).json({ error: 'Project not found' });
+
+  const messages = await Message.find({ project: projectId })
+    .sort({ createdAt: 1 })
+    .populate('sender', 'name role avatar')
+    .lean();
+
+  // Mark all admin messages as read
+  await Message.updateMany(
+    { project: projectId, senderRole: 'admin', isRead: false },
+    { isRead: true }
+  );
+
+  res.json({ messages });
+};
+
+exports.sendMessage = async (req, res) => {
+  const { projectId, content } = req.body;
+  if (!content?.trim()) return res.status(400).json({ error: 'Content is required' });
+
+  const project = await Project.findOne({ _id: projectId, client: req.user._id });
+  if (!project) return res.status(404).json({ error: 'Project not found' });
+
+  const msg = await Message.create({
+    project: projectId,
+    sender: req.user._id,
+    senderRole: 'client',
+    content: content.trim(),
+  });
+  const populated = await msg.populate('sender', 'name role avatar');
+  res.status(201).json({ message: populated });
+};
+
+exports.getUnreadCount = async (req, res) => {
+  // Get all projects for this client
+  const projects = await Project.find({ client: req.user._id }).select('_id').lean();
+  const projectIds = projects.map(p => p._id);
+
+  const count = await Message.countDocuments({
+    project: { $in: projectIds },
+    senderRole: 'admin',
+    isRead: false,
+  });
+
+  res.json({ count });
+};
+

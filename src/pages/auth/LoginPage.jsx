@@ -49,13 +49,17 @@ export default function LoginPage() {
         {/* Card */}
         <div className="glass bg-gray-900/80 border border-gray-800 rounded-2xl p-8 shadow-premium">
           {/* Brand header */}
-          <div className="flex flex-col items-center gap-3 mb-8">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-teal-600 shadow-brand-md">
-              <img src="/logo.svg" alt="Vichakra" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
-            </div>
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <motion.div 
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-16 h-16 rounded-2xl overflow-hidden border border-teal-500/30 bg-gray-900 shadow-[0_0_40px_rgba(20,184,166,0.15)] flex items-center justify-center"
+            >
+              <img src="/logo.svg" alt="Vichakra" className="w-10 h-10 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
+            </motion.div>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-white tracking-tight">Vichakra Technologies</h1>
-              <p className="text-sm text-gray-400 mt-0.5">Sign in to your account</p>
+              <h1 className="text-2xl font-black text-white tracking-tight bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">Welcome Back</h1>
+              <p className="text-sm text-gray-400 mt-1">Sign in to the Vichakra Portal</p>
             </div>
           </div>
 
@@ -98,22 +102,31 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-gray-300">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="text-xs text-teal-400 hover:text-teal-300 transition-colors focus:outline-none focus:underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative group">
+                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-teal-400 transition-colors" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className={`input-field pl-9 pr-10 w-full ${errors.password ? 'border-red-500 focus:ring-red-500/20' : ''}`}
+                  className={`input-field pl-9 pr-10 w-full transition-all focus:shadow-[0_0_0_2px_rgba(20,184,166,0.1)] ${errors.password ? 'border-red-500 focus:ring-red-500/20' : ''}`}
                   {...register('password', { required: 'Password is required' })}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -128,25 +141,30 @@ export default function LoginPage() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              whileHover={{ scale: isLoading ? 1 : 1.01 }}
-              whileTap={{ scale: isLoading ? 1 : 0.99 }}
-              className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-teal-800 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
+              whileHover={{ scale: isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: isLoading ? 1 : 0.98 }}
+              className="w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 disabled:from-teal-800 disabled:to-teal-800 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_8px_20px_-8px_rgba(20,184,166,0.5)]"
             >
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in…
+                  Authenticating…
                 </>
               ) : (
-                'Sign in'
+                'Secure Sign In'
               )}
             </motion.button>
           </form>
 
           {/* Footer note */}
-          <p className="text-center text-xs text-gray-600 mt-6">
-            Don't have an account? Contact your Vichakra project manager.
-          </p>
+          <div className="mt-6 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30 text-center">
+            <p className="text-sm text-gray-400">
+              Don't have an account?{' '}
+              <span className="text-teal-400 font-medium block sm:inline mt-1 sm:mt-0">
+                Contact your Vichakra project manager.
+              </span>
+            </p>
+          </div>
         </div>
 
         {/* Back to site */}

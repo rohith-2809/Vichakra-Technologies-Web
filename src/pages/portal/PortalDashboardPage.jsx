@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   CheckCircle2, Circle, ExternalLink, Bell,
@@ -19,6 +19,7 @@ const UPDATE_CONFIG = {
 
 export default function PortalDashboardPage() {
   const { user }              = useAuth();
+  const navigate              = useNavigate();
   const [projects, setProjects] = useState([]);
   const [updates,  setUpdates]  = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -32,10 +33,20 @@ export default function PortalDashboardPage() {
 
 
     ]).then(([proj, upd]) => {
-      setProjects(proj.data.projects);
+      const projs = proj.data.projects;
+      // Check if any project is missing submitted requirements
+      const needsReqs = projs.some(p => p.requirementsStatus !== 'submitted');
+      
+      if (needsReqs && projs.length > 0) {
+        // Enforce questionnaire
+        navigate('/portal/requirements', { replace: true });
+        return;
+      }
+
+      setProjects(projs);
       setUpdates(upd.data.updates);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [navigate]);
 
   return (
     <>

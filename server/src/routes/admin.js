@@ -3,12 +3,11 @@ const router       = express.Router();
 const { protect, requireRole } = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
 
-// All admin routes require authentication + admin role
 router.use(protect, requireRole('admin'));
 
-const adminController = require('../controllers/adminController');
+const adminController    = require('../controllers/adminController');
 const documentController = require('../controllers/documentController');
-const uploadMiddleware = require('../middleware/upload');
+const uploadMiddleware    = require('../middleware/upload');
 
 // Dashboard
 router.get('/stats', asyncHandler(adminController.getStats));
@@ -49,5 +48,14 @@ router.patch('/support/:id', asyncHandler(adminController.respondToTicket));
 
 // Documents
 router.post('/document/send', asyncHandler(documentController.sendDocument));
+
+// Messages (in-portal chat)
+router.get('/messages',                   asyncHandler(adminController.getAllProjectMessages));
+router.get('/messages/:projectId',        asyncHandler(adminController.getProjectMessages));
+router.post('/messages',                  asyncHandler(adminController.sendAdminMessage));
+
+// Email Composer
+router.get('/email/clients',              asyncHandler(adminController.getClientsForEmail));
+router.post('/email/send',                asyncHandler(adminController.sendEmailToClient));
 
 module.exports = router;

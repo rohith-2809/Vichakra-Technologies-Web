@@ -3,31 +3,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, FolderKanban, Paperclip,
   Bell, MessageSquare, ChevronLeft, ChevronRight,
-  Zap, FileText
+  Zap, FileText, MessageCircle, Star, Mail
 } from 'lucide-react';
 
 const SECTIONS = [
   {
     label: 'Workspace',
     items: [
-      { to: '/admin',          icon: LayoutDashboard, label: 'Dashboard', end: true },
-      { to: '/admin/clients',  icon: Users,           label: 'Clients' },
-      { to: '/admin/projects', icon: FolderKanban,    label: 'Projects' },
-      { to: '/admin/documents',icon: FileText,        label: 'Documents' },
+      { to: '/admin',           icon: LayoutDashboard, label: 'Dashboard',    end: true },
+      { to: '/admin/clients',   icon: Users,           label: 'Clients' },
+      { to: '/admin/projects',  icon: FolderKanban,    label: 'Projects' },
+      { to: '/admin/documents', icon: FileText,        label: 'Documents' },
     ],
   },
   {
     label: 'Content',
     items: [
-      { to: '/admin/files',    icon: Paperclip,       label: 'Files' },
-      { to: '/admin/status',   icon: Bell,            label: 'Status Updates' },
+      { to: '/admin/files',     icon: Paperclip,       label: 'Files' },
+      { to: '/admin/status',    icon: Bell,            label: 'Status Updates' },
     ],
   },
   {
-    label: 'Support',
+    label: 'Communication',
     items: [
-      { to: '/admin/support',  icon: MessageSquare,   label: 'Support Tickets' },
-      { to: '/admin/feedback', icon: MessageSquare,   label: 'Feedback' },
+      { to: '/admin/email',     icon: Mail,            label: 'Email Composer' },
+      { to: '/admin/messages',  icon: MessageCircle,   label: 'Messages' },
+      { to: '/admin/support',   icon: MessageSquare,   label: 'Support Tickets' },
+      { to: '/admin/feedback',  icon: Star,            label: 'Feedback' },
     ],
   },
 ];

@@ -13,6 +13,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './pages/auth/LoginPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
 // Admin
 import AdminLayout from './components/admin/AdminLayout';
@@ -26,11 +28,14 @@ import StatusUpdatesPage from './pages/admin/StatusUpdatesPage';
 import AdminFeedbackPage from './pages/admin/FeedbackPage';
 import AdminSupportPage from './pages/admin/SupportPage';
 import DocumentsPage from './pages/admin/DocumentsPage';
+import AdminMessagesPage from './pages/admin/AdminMessagesPage';
+import EmailComposerPage from './pages/admin/EmailComposerPage';
 
 // Portal
 import PortalLayout from './components/portal/PortalLayout';
 import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 import RequirementsPage from './pages/portal/RequirementsPage';
+import MessagesPage from './pages/portal/MessagesPage';
 import SupportPage from './pages/portal/SupportPage';
 import FeedbackPage from './pages/portal/FeedbackPage';
 
@@ -100,6 +105,8 @@ function App() {
           <Routes>
             {/* Auth — no Navbar/Footer */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Admin — protected, role: admin */}
             <Route
@@ -120,6 +127,8 @@ function App() {
               <Route path="feedback"         element={<AdminFeedbackPage />} />
               <Route path="support"          element={<AdminSupportPage />} />
               <Route path="documents"        element={<DocumentsPage />} />
+              <Route path="messages"         element={<AdminMessagesPage />} />
+              <Route path="email"            element={<EmailComposerPage />} />
             </Route>
 
             {/* Client Portal — protected, role: client */}
@@ -133,6 +142,7 @@ function App() {
             >
               <Route index                       element={<PortalDashboardPage />} />
               <Route path="requirements"         element={<RequirementsPage />} />
+              <Route path="messages"             element={<MessagesPage />} />
               <Route path="support"              element={<SupportPage />} />
               <Route path="feedback"             element={<FeedbackPage />} />
             </Route>

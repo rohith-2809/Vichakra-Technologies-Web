@@ -8,6 +8,8 @@ const StatusUpdate = require('../models/StatusUpdate');
 const Requirements = require('../models/Requirements');
 const Feedback     = require('../models/Feedback');
 const SupportTicket = require('../models/SupportTicket');
+const sendEmail    = require('../utils/mailer');
+const Message      = require('../models/Message');
 
 // ── Dashboard stats ───────────────────────────────────────────────────────────
 exports.getStats = async (_req, res) => {
@@ -244,7 +246,147 @@ exports.respondToTicket = async (req, res) => {
     req.params.id,
     { adminResponse, status: status || 'resolved' },
     { new: true }
-  );
+  ).populate('client', 'name email');
+
   if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+  // Send email if there is an admin response
+  if (adminResponse && ticket.client && ticket.client.email) {
+    try {
+      await sendEmail({
+        email: ticket.client.email,
+        subject: `Response to your support ticket: ${ticket.subject}`,
+        message: `Hello ${ticket.client.name},\n\nWe have responded to your ticket.\n\nResponse:\n${adminResponse}\n\nBest regards,\nVichakra Support`,
+        html: `
+          <p>Hello ${ticket.client.name},</p>
+          <p>We have responded to your ticket: <strong>${ticket.subject}</strong></p>
+          <hr />
+          <p><strong>Response:</strong></p>
+          <p>${adminResponse.replace(/\n/g, '<br/>')}</p>
+          <hr />
+          <p>Best regards,<br/>Vichakra Support</p>
+        `,
+      });
+    } catch (err) {
+      console.error('Error sending support ticket response email:', err);
+      // We don't fail the request if the email fails, just log it.
+    }
+  }
+
   res.json({ ticket });
 };
+
+// ── Admin Messaging ───────────────────────────────────────────────────────────
+exports.getAllProjectMessages = async (req, res) => {
+  // Get all project threads with unread count, sorted by latest message
+  const projects = await Project.find({})
+    .select('title client')
+    .populate('client', 'name email')
+    .lean();
+
+  const threads = await Promise.all(
+    projects.map(async (proj) => {
+      const lastMsg = await Message.findOne({ project: proj._id })
+        .sort({ createdAt: -1 })
+        .populate('sender', 'name')
+        .lean();
+      const unread = await Message.countDocuments({
+        project: proj._id,
+        senderRole: 'client',
+        isRead: false,
+      });
+      return { project: proj, lastMessage: lastMsg, unreadCount: unread };
+    })
+  );
+
+  // Sort: threads with messages first, then by latest message date
+  threads.sort((a, b) => {
+    if (!a.lastMessage && !b.lastMessage) return 0;
+    if (!a.lastMessage) return 1;
+    if (!b.lastMessage) return -1;
+    return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt);
+  });
+
+  res.json({ threads });
+};
+
+exports.getProjectMessages = async (req, res) => {
+  const { projectId } = req.params;
+
+  const messages = await Message.find({ project: projectId })
+    .sort({ createdAt: 1 })
+    .populate('sender', 'name role avatar')
+    .lean();
+
+  // Mark client messages as read when admin views them
+  await Message.updateMany(
+    { project: projectId, senderRole: 'client', isRead: false },
+    { isRead: true }
+  );
+
+  res.json({ messages });
+};
+
+exports.sendAdminMessage = async (req, res) => {
+  const { projectId, content } = req.body;
+  if (!content?.trim()) return res.status(400).json({ error: 'Content is required' });
+
+  const project = await Project.findById(projectId);
+  if (!project) return res.status(404).json({ error: 'Project not found' });
+
+  const msg = await Message.create({
+    project: projectId,
+    sender: req.user._id,
+    senderRole: 'admin',
+    content: content.trim(),
+  });
+  const populated = await msg.populate('sender', 'name role avatar');
+  res.status(201).json({ message: populated });
+};
+
+// ── Email Composer ─────────────────────────────────────────────────────────────
+exports.getClientsForEmail = async (req, res) => {
+  const clients = await User.find({ role: 'client', isActive: true })
+    .select('name email company')
+    .sort({ name: 1 })
+    .lean();
+  res.json({ clients });
+};
+
+exports.sendEmailToClient = async (req, res) => {
+  const { to, subject, htmlBody } = req.body;
+
+  if (!to || !subject || !htmlBody) {
+    return res.status(400).json({ error: 'to, subject, and htmlBody are required' });
+  }
+
+  // Validate recipients are real clients
+  const emails = Array.isArray(to) ? to : [to];
+  const clients = await User.find({ email: { $in: emails }, role: 'client' }).select('name email').lean();
+
+  if (clients.length === 0) {
+    return res.status(404).json({ error: 'No valid client emails found' });
+  }
+
+  const results = await Promise.allSettled(
+    clients.map(client =>
+      sendEmail({
+        email: client.email,
+        subject,
+        message: subject,
+        html: htmlBody,
+      })
+    )
+  );
+
+  const failed = results.filter(r => r.status === 'rejected').length;
+  const sent   = results.filter(r => r.status === 'fulfilled').length;
+
+  res.json({
+    message: `Email sent to ${sent} client(s)${failed > 0 ? `, ${failed} failed` : ''}`,
+    sent,
+    failed,
+  });
+};
+
+
