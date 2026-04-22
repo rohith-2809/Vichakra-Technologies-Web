@@ -13,11 +13,12 @@ const uploadMiddleware    = require('../middleware/upload');
 router.get('/stats', asyncHandler(adminController.getStats));
 
 // Clients
-router.get('/clients',        asyncHandler(adminController.getClients));
-router.post('/clients',       asyncHandler(adminController.createClient));
-router.get('/clients/:id',    asyncHandler(adminController.getClient));
-router.put('/clients/:id',    asyncHandler(adminController.updateClient));
-router.delete('/clients/:id', asyncHandler(adminController.deactivateClient));
+router.get('/clients',                    asyncHandler(adminController.getClients));
+router.post('/clients',                   asyncHandler(adminController.createClient));
+router.get('/clients/:id',                asyncHandler(adminController.getClient));
+router.put('/clients/:id',                asyncHandler(adminController.updateClient));
+router.delete('/clients/:id/permanent',   asyncHandler(adminController.deleteClient));
+router.delete('/clients/:id',             asyncHandler(adminController.deactivateClient));
 
 // Projects
 router.get('/projects',                      asyncHandler(adminController.getProjects));
@@ -57,5 +58,6 @@ router.post('/messages',                  asyncHandler(adminController.sendAdmin
 // Email Composer
 router.get('/email/clients',              asyncHandler(adminController.getClientsForEmail));
 router.post('/email/send',                asyncHandler(adminController.sendEmailToClient));
+router.post('/email/generate',            asyncHandler(adminController.generateEmailWithGrok));
 
 module.exports = router;

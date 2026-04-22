@@ -113,8 +113,8 @@ export default function SupportPage() {
       setTickets((prev) => [res.data.ticket, ...prev]);
       reset({ category: 'general' });
       setShowForm(false);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit ticket');
+    } catch {
+      setError('Sorry for the inconvenience — your request couldn\'t be submitted. Please try again or email us directly at info@vichakratechnologies.com.');
     } finally { setCreating(false); }
   };
 

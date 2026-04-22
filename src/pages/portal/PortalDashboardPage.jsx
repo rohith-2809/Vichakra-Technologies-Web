@@ -23,28 +23,24 @@ export default function PortalDashboardPage() {
   const [projects, setProjects] = useState([]);
   const [updates,  setUpdates]  = useState([]);
   const [loading,  setLoading]  = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showTutorial, setShowTutorial] = useState(user?.isFirstLogin === true);
 
   useEffect(() => {
     Promise.all([
       api.get('/portal/projects'),
-      
       api.get('/portal/status-updates'),
-
-
     ]).then(([proj, upd]) => {
       const projs = proj.data.projects;
-      // Check if any project is missing submitted requirements
       const needsReqs = projs.some(p => p.requirementsStatus !== 'submitted');
-      
       if (needsReqs && projs.length > 0) {
-        // Enforce questionnaire
         navigate('/portal/requirements', { replace: true });
         return;
       }
-
       setProjects(projs);
       setUpdates(upd.data.updates);
+    }).catch(() => {
+      setLoadError('Sorry for the inconvenience — we couldn\'t load your dashboard. Please refresh the page or contact us at info@vichakratechnologies.com.');
     }).finally(() => setLoading(false));
   }, [navigate]);
 
@@ -53,6 +49,12 @@ export default function PortalDashboardPage() {
       {showTutorial && <OnboardingTutorial onComplete={() => setShowTutorial(false)} />}
 
       <div className="space-y-8">
+        {loadError && (
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl px-5 py-4 text-sm text-red-700">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+            <span>{loadError}</span>
+          </div>
+        )}
         {/* Welcome */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
@@ -282,10 +284,12 @@ function QuickMessage() {
   const [sent,    setSent]    = useState(false);
   const [sending, setSending] = useState(false);
   const [msg,     setMsg]     = useState('');
+  const [error,   setError]   = useState('');
 
   const send = async () => {
     if (!msg.trim()) return;
     setSending(true);
+    setError('');
     try {
       await api.post('/portal/support', {
         subject:  'Quick message from portal',
@@ -294,8 +298,9 @@ function QuickMessage() {
       });
       setSent(true);
       setMsg('');
-    } catch { /* silent */ }
-    finally { setSending(false); }
+    } catch {
+      setError('Sorry, your message couldn\'t be sent. Please try again or email us at info@vichakratechnologies.com.');
+    } finally { setSending(false); }
   };
 
   return (
@@ -310,6 +315,11 @@ function QuickMessage() {
         </div>
       </div>
 
+      {error && (
+        <div className="flex items-start gap-2 text-red-600 bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl text-xs mb-3">
+          <AlertTriangle size={13} className="shrink-0 mt-0.5" /> {error}
+        </div>
+      )}
       {sent ? (
         <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 px-4 py-3 rounded-xl text-sm font-medium">
           <CheckCheck size={15} />

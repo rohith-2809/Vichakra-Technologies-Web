@@ -19,6 +19,7 @@ export default function MessagesPage() {
   const [content,         setContent]         = useState('');
   const [sending,         setSending]         = useState(false);
   const [loading,         setLoading]         = useState(false);
+  const [sendError,       setSendError]       = useState('');
   const bottomRef = useRef(null);
   const pollRef   = useRef(null);
 
@@ -55,6 +56,7 @@ export default function MessagesPage() {
   const sendMessage = async () => {
     if (!content.trim() || !selectedProject || sending) return;
     setSending(true);
+    setSendError('');
     try {
       const { data } = await api.post('/portal/messages', {
         projectId: selectedProject,
@@ -62,8 +64,8 @@ export default function MessagesPage() {
       });
       setMessages(prev => [...prev, data.message]);
       setContent('');
-    } catch (err) {
-      alert(err.response?.data?.error || 'Failed to send message');
+    } catch {
+      setSendError('Sorry, your message couldn\'t be sent. Please try again.');
     } finally {
       setSending(false);
     }
@@ -158,6 +160,11 @@ export default function MessagesPage() {
 
           {/* Input */}
           <div className="p-4 border-t border-gray-100 bg-white/60">
+            {sendError && (
+              <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-xl text-xs mb-3">
+                <span className="shrink-0">⚠</span> {sendError}
+              </div>
+            )}
             <div className="flex items-end gap-3">
               <textarea
                 value={content}

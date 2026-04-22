@@ -1,6 +1,7 @@
 const bcrypt       = require('bcryptjs');
 const path         = require('path');
 const fs           = require('fs');
+const axios        = require('axios');
 const User         = require('../models/User');
 const Project      = require('../models/Project');
 const FileModel    = require('../models/File');
@@ -59,10 +60,15 @@ exports.createClient = async (req, res) => {
 };
 
 exports.updateClient = async (req, res) => {
-  const allowed = ['name', 'company', 'phone', 'industry', 'isActive', 'avatar'];
+  const allowed = ['name', 'email', 'company', 'phone', 'industry', 'isActive', 'avatar'];
   const update  = Object.fromEntries(
     Object.entries(req.body).filter(([k]) => allowed.includes(k))
   );
+  // Check email uniqueness if updating email
+  if (update.email) {
+    const existing = await User.findOne({ email: update.email, _id: { $ne: req.params.id } });
+    if (existing) return res.status(400).json({ error: 'Email already in use' });
+  }
   const client = await User.findOneAndUpdate(
     { _id: req.params.id, role: 'client' },
     update,
@@ -84,6 +90,28 @@ exports.deactivateClient = async (req, res) => {
   }
   await User.findByIdAndUpdate(req.params.id, { isActive: false });
   res.json({ message: 'Client deactivated' });
+};
+
+exports.deleteClient = async (req, res) => {
+  const client = await User.findOne({ _id: req.params.id, role: 'client' });
+  if (!client) return res.status(404).json({ error: 'Client not found' });
+
+  // Cascade-delete all client data
+  const clientProjects = await Project.find({ client: client._id }).select('_id');
+  const projectIds = clientProjects.map(p => p._id);
+
+  await Promise.all([
+    Project.deleteMany({ client: client._id }),
+    FileModel.deleteMany({ uploadedBy: client._id }),
+    Message.deleteMany({ sender: client._id }),
+    Feedback.deleteMany({ client: client._id }),
+    SupportTicket.deleteMany({ client: client._id }),
+    Requirements.deleteMany({ client: client._id }),
+    StatusUpdate.deleteMany({ project: { $in: projectIds } }),
+  ]);
+
+  await client.deleteOne();
+  res.json({ message: 'Client permanently deleted' });
 };
 
 // ── Projects ──────────────────────────────────────────────────────────────────
@@ -387,6 +415,112 @@ exports.sendEmailToClient = async (req, res) => {
     sent,
     failed,
   });
+};
+
+// ── AI Email Generator ─────────────────────────────────────────────────────────
+// AI writes ONLY the content (JSON). We assemble the premium HTML here.
+const buildEmailHtml = exports.buildEmailHtml = ({ eyebrow, headline, body, ctaText, ctaUrl, note }) => {
+  const PORTAL = 'https://www.vichakratechnologies.com/login';
+  const link   = ctaUrl || PORTAL;
+  const noteHtml = note
+    ? `<div style="border-top:1px solid #f1f5f9;padding-top:20px;margin-top:8px">
+         <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;color:#94a3b8;font-size:13px;line-height:1.7">${note}</p>
+       </div>`
+    : '';
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.12)">
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,#0f172a 0%,#134e4a 100%);padding:36px 40px 28px;text-align:center">
+    <div style="display:inline-block;background:rgba(15,118,110,0.25);border:1px solid rgba(20,184,166,0.3);border-radius:10px;padding:8px 20px;margin-bottom:16px">
+      <p style="margin:0;color:#5eead4;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Vichakra Technologies</p>
+    </div>
+    <div style="width:48px;height:3px;background:linear-gradient(90deg,#0f766e,#14b8a6);margin:0 auto"></div>
+  </div>
+  <!-- BODY -->
+  <div style="padding:48px 40px 40px">
+    <p style="margin:0 0 10px;color:#0f766e;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">${eyebrow}</p>
+    <h1 style="margin:0 0 20px;color:#0f172a;font-size:26px;font-weight:800;line-height:1.3">${headline}</h1>
+    <div style="color:#475569;font-size:15px;line-height:1.85;margin-bottom:32px">${body.replace(/\n/g, '<br/>')}</div>
+    <div style="text-align:center;margin-bottom:32px">
+      <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#0f766e,#0d9488);color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:16px 40px;border-radius:10px;letter-spacing:0.3px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">${ctaText} →</a>
+    </div>
+    ${noteHtml}
+  </div>
+  <!-- FOOTER -->
+  <div style="background:#0f172a;padding:32px 40px;text-align:center">
+    <p style="margin:0 0 4px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:0.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Vichakra Technologies</p>
+    <p style="margin:0 0 16px;color:#64748b;font-size:12px;letter-spacing:0.3px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">Crafting Digital Excellence</p>
+    <div style="width:40px;height:2px;background:linear-gradient(90deg,#0f766e,#14b8a6);margin:0 auto 16px"></div>
+    <p style="margin:0 0 6px;color:#475569;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif">© 2026 Vichakra Technologies. All rights reserved.</p>
+    <p style="margin:0 0 4px;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><a href="https://www.vichakratechnologies.com" style="color:#14b8a6;text-decoration:none">www.vichakratechnologies.com</a></p>
+    <p style="margin:0;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif"><a href="mailto:info@vichakratechnologies.com" style="color:#0f766e;text-decoration:none">info@vichakratechnologies.com</a></p>
+  </div>
+</div>`;
+};
+
+exports.generateEmailWithGrok = async (req, res) => {
+  const { prompt } = req.body;
+  if (!prompt?.trim()) return res.status(400).json({ error: 'prompt is required' });
+
+  let response;
+  try {
+    response = await axios.post(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
+        model: 'llama-3.1-8b-instant',
+        max_tokens: 350,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a professional email copywriter for Vichakra Technologies, a software development agency. ' +
+              'Given a prompt, return ONLY a JSON object with these exact keys:\n' +
+              '- eyebrow: short 2-4 word category label (e.g. "Project Update", "Welcome Aboard")\n' +
+              '- headline: punchy, bold headline sentence (max 10 words)\n' +
+              '- body: 2-3 short engaging paragraphs separated by \\n (plain text, no HTML)\n' +
+              '- ctaText: action button label (3-5 words, no arrow)\n' +
+              '- ctaUrl: leave empty string ""\n' +
+              '- note: optional 1 sentence footer note, or empty string ""\n' +
+              'Keep tone confident, warm, and professional. No fluff.',
+          },
+          { role: 'user', content: prompt.trim() },
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+  } catch (err) {
+    const message = err.response?.data?.error?.message || err.message || 'AI error';
+    console.error('Groq API error:', err.response?.status, err.response?.data || err.message);
+    return res.status(502).json({ error: `AI: ${message}` });
+  }
+
+  let content;
+  try {
+    content = JSON.parse(response.data.choices?.[0]?.message?.content || '{}');
+  } catch {
+    return res.status(500).json({ error: 'AI returned invalid content' });
+  }
+
+  const { eyebrow, headline, body, ctaText, ctaUrl, note } = content;
+  if (!headline || !body) return res.status(500).json({ error: 'AI returned incomplete content' });
+
+  const html = buildEmailHtml({
+    eyebrow:  eyebrow  || 'Message',
+    headline: headline,
+    body:     body,
+    ctaText:  ctaText  || 'View in Portal',
+    ctaUrl:   ctaUrl   || '',
+    note:     note     || 'Reply to this email if you have any questions — we\'re always here.',
+  });
+
+  res.json({ html });
 };
 
 

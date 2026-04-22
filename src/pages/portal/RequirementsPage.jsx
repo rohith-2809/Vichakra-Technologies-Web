@@ -115,6 +115,7 @@ export default function RequirementsPage() {
   const [deliverableNotes, setDeliverableNotes] = useState({});
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [pageError, setPageError] = useState('');
   // Keep fileRef input always mounted so ref stays valid across step transitions
   const fileRef = useRef();
 
@@ -228,9 +229,10 @@ export default function RequirementsPage() {
       currentReqs = await saveDraft();
     }
     if (!currentReqs?._id) {
-      alert('Please fill in the project vision first before uploading files.');
+      setPageError('Please complete the project vision and project type fields before uploading files.');
       return;
     }
+    setPageError('');
     setUploadingFiles(true);
     const formData = new FormData();
     Array.from(files).forEach((f) => formData.append('files', f));
@@ -241,18 +243,18 @@ export default function RequirementsPage() {
       );
       setUploadedFiles((prev) => [...prev, ...data.files]);
     } catch (err) {
-      alert(err.response?.data?.error || 'Upload failed');
+      setPageError(err.response?.data?.error || 'Sorry for the inconvenience — file upload failed. Please try again or contact info@vichakratechnologies.com.');
     } finally { setUploadingFiles(false); }
   };
 
   const deleteFile = async (fileId) => {
     if (isLocked || !reqs?._id) return;
-    if (!window.confirm("Are you sure you want to remove this file?")) return;
+    setPageError('');
     try {
       await api.delete(`/portal/requirements/${reqs._id}/files/${fileId}`);
       setUploadedFiles(prev => prev.filter(f => f._id !== fileId));
-    } catch (err) {
-      alert(err.response?.data?.error || 'Failed to delete file');
+    } catch {
+      setPageError('Sorry, we couldn\'t remove that file. Please try again.');
     }
   };
 
@@ -261,11 +263,12 @@ export default function RequirementsPage() {
   const submit = async () => {
     if (!canSubmit || isLocked || !reqs) return;
     setSubmitting(true);
+    setPageError('');
     try {
       const { data } = await api.patch(`/portal/requirements/${reqs._id}`, { status: 'submitted', ...form });
       setReqs(data.requirements);
-    } catch (err) {
-      alert(err.response?.data?.error || 'Submit failed');
+    } catch {
+      setPageError('Sorry for the inconvenience — submission failed. Please try again or contact us at info@vichakratechnologies.com.');
     } finally { setSubmitting(false); }
   };
 
@@ -330,6 +333,15 @@ export default function RequirementsPage() {
               <Lock size={14} />
               Requirements submitted. Contact support to request changes.
               <span className="ml-auto text-xs font-medium capitalize">{reqs.status}</span>
+            </div>
+          )}
+
+          {/* Error banner */}
+          {pageError && (
+            <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+              <span className="shrink-0 mt-0.5">⚠</span>
+              <span className="flex-1">{pageError}</span>
+              <button onClick={() => setPageError('')} className="shrink-0 text-red-400 hover:text-red-600 transition-colors ml-2">✕</button>
             </div>
           )}
 
