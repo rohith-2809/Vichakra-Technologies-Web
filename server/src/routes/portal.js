@@ -20,7 +20,7 @@ router.post('/requirements',            asyncHandler(portalController.saveRequir
 router.patch('/requirements/:id',       asyncHandler(portalController.updateRequirements));
 router.post(
   '/requirements/:id/files',
-  uploadMiddleware.array('files', 10),
+  uploadMiddleware.array('files', 20),
   asyncHandler(portalController.uploadRequirementFiles)
 );
 router.delete('/requirements/:id/files/:fileId', asyncHandler(portalController.deleteRequirementFile));

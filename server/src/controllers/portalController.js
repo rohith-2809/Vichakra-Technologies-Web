@@ -92,12 +92,21 @@ exports.updateRequirements = async (req, res) => {
 
 exports.uploadRequirementFiles = async (req, res) => {
   if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'No files uploaded' });
+    return res.status(400).json({ error: 'No files were received. Please ensure you have selected files to upload.' });
   }
-  const reqs = await Requirements.findOne({ _id: req.params.id, client: req.user._id });
-  if (!reqs) return res.status(404).json({ error: 'Requirements not found' });
-  if (reqs.status === 'submitted') {
-    return res.status(400).json({ error: 'Requirements already submitted.' });
+
+  // Find by Requirement ID or Project ID as fallback
+  let reqs = await Requirements.findOne({ _id: req.params.id, client: req.user._id });
+  if (!reqs) {
+    reqs = await Requirements.findOne({ project: req.params.id, client: req.user._id });
+  }
+
+  if (!reqs) {
+    return res.status(404).json({ error: 'Requirements record not found. Please save your draft first.' });
+  }
+
+  if (reqs.status === 'submitted' || reqs.status === 'acknowledged') {
+    return res.status(400).json({ error: `Cannot upload files to a ${reqs.status} requirement.` });
   }
 
   const savedFiles = await Promise.all(

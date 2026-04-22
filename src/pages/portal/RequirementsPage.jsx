@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClipboardList, Upload, X, Plus, Check, Lock, ChevronRight, ChevronLeft, Paintbrush } from 'lucide-react';
+import { ClipboardList, Upload, X, Plus, Check, Lock, ChevronRight, ChevronLeft, Paintbrush, AlertCircle } from 'lucide-react';
 import api from '../../api/axios';
 
 const STEPS = ['Overview', 'Scope & Features', 'Brand & Design', 'Files'];
@@ -238,8 +238,7 @@ export default function RequirementsPage() {
     Array.from(files).forEach((f) => formData.append('files', f));
     try {
       const { data } = await api.post(
-        `/portal/requirements/${currentReqs._id}/files`, formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        `/portal/requirements/${currentReqs._id}/files`, formData
       );
       setUploadedFiles((prev) => [...prev, ...data.files]);
     } catch (err) {
@@ -258,7 +257,10 @@ export default function RequirementsPage() {
     }
   };
 
-  const canSubmit = form.vision.trim().length > 20 && form.projectType.trim().length > 0;
+  const canSubmit = 
+    form.vision.trim().length >= 20 && 
+    form.projectType.trim().length > 0 && 
+    form.deliverables.length > 0;
 
   const submit = async () => {
     if (!canSubmit || isLocked || !reqs) return;
@@ -370,6 +372,7 @@ export default function RequirementsPage() {
 
           {/* Hidden file input - MUST be outside AnimatePresence so the ref stays mounted */}
           <input ref={fileRef} type="file" multiple className="hidden"
+            accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.zip,.doc,.docx,.xls,.xlsx,.mp4"
             onChange={(e) => uploadFiles(e.target.files)} />
 
           {/* Step panels */}
@@ -813,7 +816,7 @@ export default function RequirementsPage() {
                            <Upload size={28} className="text-teal-600" />
                         </div>
                         <p className="text-lg font-bold text-gray-900">{uploadingFiles ? 'Uploading…' : 'Drop files here or click to browse'}</p>
-                        <p className="text-[14px] text-gray-500 mt-2">Max 10MB per file · jpg, png, pdf, zip</p>
+                        <p className="text-[14px] text-gray-500 mt-2">Max 50MB per file · jpg, png, pdf, zip, docx, pptx, etc.</p>
                       </div>
                     )}
                     {uploadedFiles.length > 0 && (
@@ -860,6 +863,39 @@ export default function RequirementsPage() {
                 <span className="text-[13px] font-bold text-gray-400">
                   {saving ? 'Saving…' : saved ? '✓ Draft saved' : ''}
                 </span>
+              )}
+
+              {step === STEPS.length - 1 && !isLocked && !canSubmit && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }} 
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-50/50 backdrop-blur-sm border border-red-100 rounded-2xl p-4 mr-4 flex flex-col items-end gap-2 shadow-sm"
+                >
+                  <div className="flex items-center gap-2 text-red-600 mb-1">
+                    <span className="text-[11px] font-black uppercase tracking-widest">Action Required</span>
+                    <AlertCircle size={14} />
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    {form.projectType.trim().length === 0 && (
+                      <button onClick={() => setStep(0)} className="group flex items-center gap-2 text-[13px] text-gray-500 hover:text-red-600 transition-colors">
+                        <span>Select project type</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 group-hover:scale-125 transition-transform" />
+                      </button>
+                    )}
+                    {form.vision.trim().length < 20 && (
+                      <button onClick={() => setStep(0)} className="group flex items-center gap-2 text-[13px] text-gray-500 hover:text-red-600 transition-colors">
+                        <span>Describe your vision (min 20 chars)</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 group-hover:scale-125 transition-transform" />
+                      </button>
+                    )}
+                    {form.deliverables.length === 0 && (
+                      <button onClick={() => setStep(1)} className="group flex items-center gap-2 text-[13px] text-gray-500 hover:text-red-600 transition-colors">
+                        <span>Select core deliverables</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 group-hover:scale-125 transition-transform" />
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
               )}
 
               {step < STEPS.length - 1 ? (
