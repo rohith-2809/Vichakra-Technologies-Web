@@ -1,23 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, ClipboardList, MessageSquare, Star,
-  LogOut, Menu, X, Zap,
+  LogOut, Menu, X, Zap, MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import ChatBot from './ChatBot';
+import api from '../../api/axios';
 
 const NAV = [
   { to: '/portal',              icon: LayoutDashboard, label: 'Dashboard',    end: true },
   { to: '/portal/requirements', icon: ClipboardList,   label: 'Requirements' },
+  { to: '/portal/messages',     icon: MessageCircle,   label: 'Messages',    badge: true },
   { to: '/portal/support',      icon: MessageSquare,   label: 'Support' },
   { to: '/portal/feedback',     icon: Star,            label: 'Feedback' },
 ];
 
-function NavItems({ onClose }) {
+function NavItems({ onClose, unreadMessages }) {
   return (
     <div className="space-y-0.5">
-      {NAV.map(({ to, icon: Icon, label, end }) => (
+      {NAV.map(({ to, icon: Icon, label, end, badge }) => (
         <NavLink
           key={to}
           to={to}
@@ -35,6 +38,11 @@ function NavItems({ onClose }) {
             <>
               <Icon size={16} className={`shrink-0 ${isActive ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
               {label}
+              {badge && unreadMessages > 0 && (
+                <span className="ml-auto text-[10px] bg-teal-500 text-white rounded-full px-1.5 py-0.5 font-bold">
+                  {unreadMessages}
+                </span>
+              )}
             </>
           )}
         </NavLink>
@@ -47,6 +55,16 @@ export default function PortalLayout() {
   const { user, logout } = useAuth();
   const navigate          = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  // Poll for unread message count
+  useEffect(() => {
+    const fetchUnread = () =>
+      api.get('/portal/messages/unread').then(({ data }) => setUnreadMessages(data.count)).catch(() => {});
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -74,7 +92,7 @@ export default function PortalLayout() {
         {/* Nav */}
         <nav className="flex-1 p-3 pt-4">
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2 px-3">Navigation</p>
-          <NavItems />
+          <NavItems unreadMessages={unreadMessages} />
         </nav>
 
         {/* User section */}
@@ -124,7 +142,7 @@ export default function PortalLayout() {
                 </button>
               </div>
               <nav className="flex-1 p-3 pt-4">
-                <NavItems onClose={() => setMobileOpen(false)} />
+                <NavItems onClose={() => setMobileOpen(false)} unreadMessages={unreadMessages} />
               </nav>
               <div className="p-3 border-t border-gray-100">
                 <button
@@ -161,6 +179,9 @@ export default function PortalLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating Chatbot */}
+      <ChatBot />
     </div>
   );
 }

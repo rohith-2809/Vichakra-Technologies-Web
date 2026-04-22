@@ -18,4 +18,8 @@ router.post('/refresh', asyncHandler(authController.refresh));
 router.post('/logout',  protect, asyncHandler(authController.logout));
 router.get('/me',       protect, asyncHandler(authController.getMe));
 
+router.post('/forgotpassword', asyncHandler(authController.forgotPassword));
+router.post('/resetpassword', asyncHandler(authController.resetPassword));
+
 module.exports = router;
+

@@ -4,12 +4,16 @@ import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
 
 const TITLE_MAP = {
-  '/admin':          'Dashboard',
-  '/admin/clients':  'Clients',
-  '/admin/projects': 'Projects',
-  '/admin/files':    'Files',
-  '/admin/status':   'Status Updates',
-  '/admin/feedback': 'Feedback',
+  '/admin':           'Dashboard',
+  '/admin/clients':   'Clients',
+  '/admin/projects':  'Projects',
+  '/admin/files':     'Files',
+  '/admin/status':    'Status Updates',
+  '/admin/feedback':  'Feedback',
+  '/admin/support':   'Support Tickets',
+  '/admin/messages':  'Messages',
+  '/admin/documents': 'Documents',
+  '/admin/email':     'Email Composer',
 };
 
 function getTitle(pathname) {

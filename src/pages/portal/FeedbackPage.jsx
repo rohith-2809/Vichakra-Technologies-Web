@@ -53,6 +53,7 @@ export default function FeedbackPage() {
   const [loading,    setLoading]    = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [done,       setDone]       = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [ratings, setRatings] = useState({ rating: 0, communication: 0, quality: 0, timeliness: 0 });
   const [comments, setComments] = useState('');
 
@@ -87,11 +88,12 @@ export default function FeedbackPage() {
   const submit = async () => {
     if (!allRated || !selected) return;
     setSubmitting(true);
+    setSubmitError('');
     try {
       await api.post('/portal/feedback', { project: selected, ...ratings, comments });
       setDone(true);
-    } catch (err) {
-      alert(err.response?.data?.error || 'Submit failed');
+    } catch {
+      setSubmitError('Sorry for the inconvenience — we couldn\'t submit your feedback. Please try again or contact info@vichakratechnologies.com.');
     } finally { setSubmitting(false); }
   };
 
@@ -192,6 +194,11 @@ export default function FeedbackPage() {
               </div>
 
               <div className="px-8 py-6 border-t border-gray-100 bg-white/30 backdrop-blur-sm">
+                {submitError && (
+                  <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 mb-4">
+                    <span className="shrink-0">⚠</span> {submitError}
+                  </div>
+                )}
                 <button
                   onClick={submit}
                   disabled={!allRated || submitting}
